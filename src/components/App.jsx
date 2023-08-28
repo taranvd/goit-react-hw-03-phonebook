@@ -10,6 +10,23 @@ export class App extends Component {
     filter: '',
   };
 
+  componentDidMount = () => {
+    const contact = localStorage.getItem('contact');
+    const parsedContact = JSON.parse(contact);
+
+    if (parsedContact) {
+      this.setState({
+        contacts: parsedContact,
+      });
+    }
+  };
+
+  componentDidUpdate = (prevProps, prevState) => {
+    if (prevState.contacts !== this.state.contacts) {
+      localStorage.setItem('contact', JSON.stringify(this.state.contacts));
+    }
+  };
+
   changeFilter = newFilter => {
     this.setState({
       filter: newFilter,
@@ -44,6 +61,12 @@ export class App extends Component {
     });
   };
 
+  resetFilters = () => {
+    this.setState({
+      contacts: [],
+    });
+  };
+
   render() {
     const { filter, contacts } = this.state;
 
@@ -57,7 +80,11 @@ export class App extends Component {
           <ContactForm addContact={this.addContact} />
         </Section>
         <Section title="Contact">
-          <ContactFilter filter={filter} changeFilter={this.changeFilter} />
+          <ContactFilter
+            filter={filter}
+            changeFilter={this.changeFilter}
+            onClearFilters={this.resetFilters}
+          />
           <ContactsList
             contacts={visibleContacts}
             deleteContact={this.deleteContact}
